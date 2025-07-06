@@ -162,5 +162,5 @@ Consulta finalizada
 ## Future improvements
 
 - Associate it with a script for scanning URLs:
-  - Generate a hash from the URL given and search for its data on Virus Total;
+  - Generate a hash from the URL given and search for its data on URLscan.io;
   - Integrate the scan above with Falcon Sandbox.
