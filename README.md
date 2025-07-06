@@ -146,7 +146,7 @@ Consulta finalizada
 
 ### Common Issues
 
-1. **"VT_API_KEY not set in environment!"**
+1. **"VT_API_KEY não está configurada!"**
    - Make sure you've set the environment variable correctly
    - Check that the variable name is exactly `VT_API_Key`
 
