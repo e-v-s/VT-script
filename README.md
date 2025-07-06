@@ -163,4 +163,4 @@ Consulta finalizada
 
 - Associate it with a script for scanning URLs:
   - Generate a hash from the URL given and search for its data on Virus Total;
-  - Integrate the scan above with the Falcon Sandbox.
+  - Integrate the scan above with Falcon Sandbox.
