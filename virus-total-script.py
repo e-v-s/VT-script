@@ -1,5 +1,4 @@
 import os
-import requests
 import asyncio
 import aiohttp
 import datetime
@@ -13,9 +12,9 @@ if not api_key:
   raise RuntimeError("VT_API_KEY não está configurada!")
 
 print("""
-    ฅ^•ﻌ•^ฅ
-    Virus Total IP Lookup Script
-    By Evs
+        ฅ^•ﻌ•^ฅ
+        Virus Total IP Lookup Script
+        By Evs
 """)
 
 # Ask for the IP to be looked up
