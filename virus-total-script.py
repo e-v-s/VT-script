@@ -9,7 +9,7 @@ api_key = os.environ.get("VT_API_Key")
 
 # If there is no API key on environment, raise an error
 if not api_key:
-  raise RuntimeError("VT_API_KEY not set in environment!")
+  raise RuntimeError("VT_API_KEY não está configurada!")
 
 # Ask for the IP to be looked up
 ip = input("IP para consulta: ")
