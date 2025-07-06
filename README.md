@@ -12,7 +12,7 @@ A Python script that queries VirusTotal's API to get detailed information about 
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repository-url>
+git clone git@github.com:e-v-s/VT-script.git
 cd VT-script
 ```
 
