@@ -12,7 +12,7 @@ A Python script that queries VirusTotal's API to get detailed information about 
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repository-url>
+git clone git@github.com:e-v-s/VT-script.git
 cd VT-script
 ```
 
@@ -146,7 +146,7 @@ Consulta finalizada
 
 ### Common Issues
 
-1. **"VT_API_KEY not set in environment!"**
+1. **"VT_API_KEY não está configurada!"**
    - Make sure you've set the environment variable correctly
    - Check that the variable name is exactly `VT_API_Key`
 
