@@ -158,11 +158,6 @@ Consulta finalizada
    - Wait a minute before making another request
    - Consider upgrading to a paid VirusTotal plan for higher limits
 
-## License
-
-This project is open source. Feel free to modify and distribute.
-
----
 
 ## Future improvements
 
