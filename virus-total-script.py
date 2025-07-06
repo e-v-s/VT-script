@@ -3,6 +3,7 @@ import requests
 import asyncio
 import aiohttp
 import datetime
+import time
 
 # API key from virus total is needed to use the API
 api_key = os.environ.get("VT_API_Key")
@@ -37,6 +38,10 @@ async def getIP(ip, api_key):
 
 # Filter the WHOIS data, with only the important fields
 def filter_whois_data(whois_data):
+  # If WHOIS is an integer, it's probably not the actual WHOIS data
+  if isinstance(whois_data, int):
+    return f"WHOIS ID/Timestamp: {whois_data} (dados completos não disponíveis)"
+    
   # If there is no WHOIS data, return a message
   if not whois_data:
     return "Não existem dados de WHOIS"
@@ -95,9 +100,17 @@ def format_timestamp(timestamp):
 
 # Main function that runs the script
 async def main():
-  # Result of the async function getIP()
+  print("=" * 50)
+  print("Resultados da Consulta no VirusTotal")
+  print("=" * 50)
+  print(f"IP consultado: {ip}")
+  print("-" * 50)
+  
+  # Get basic IP information
+  print("Buscando informações básicas do IP...")
   result = await getIP(ip, api_key)
-  # Terms to be searched in result
+  
+  # Terms to be searched in result (including whois for main response)
   search_terms = [
     'jarm', 'as_owner', 'country', 'last_https_certificate_date', 'last_analysis_stats', 'reputation', 'total_votes', 'whois'
   ]
@@ -129,33 +142,36 @@ async def main():
     search_recursive(data)
     return found_fields
 
-  # Print result header
-  print("=" * 50)
-  print("Resultados da Consulta no VirusTotal")
-  print("=" * 50)
-  print(f"IP consultado: {ip}")
-  print("-" * 50)
-
-  # Alocate the return from search_fields() to found_data
+  # Get basic data including WHOIS from main response
   found_data = search_fields(result, search_terms)
+  
+  # Check if WHOIS is in the main response
+  whois_from_main = found_data.get('whois')
+  
+  # Also check for other possible WHOIS-related fields
+  whois_related_fields = [
+    'whois_data', 'whois_info', 'whois_details', 'registration', 
+    'whois_text', 'whois_raw', 'whois_content', 'whois_string',
+    'registrar', 'organization', 'org', 'netname', 'descr',
+    'country', 'admin-c', 'tech-c', 'mnt-by', 'created',
+    'updated', 'status', 'inetnum', 'netrange'
+  ]
+  whois_alternative = None
+  for field in whois_related_fields:
+    if field in found_data:
+      whois_alternative = found_data[field]
+      break
+  
+  # Remove whois from search_terms for display
+  display_terms = [term for term in search_terms if term != 'whois']
 
-  for term in search_terms:
+  # Display basic information first
+  for term in display_terms:
     if term in found_data:
       value = found_data[term]
           
-      # Special handling for WHOIS data
-      if term == 'whois':
-        print(f"{term.upper()}:")
-        filtered_whois = filter_whois_data(value)
-              
-        if isinstance(filtered_whois, dict):
-          for key, val in filtered_whois.items():
-            print(f"  • {key}: {val}")
-        else:
-          print(f"  {filtered_whois}")
-          
       # Special handling for timestamp fields
-      elif term == 'last_https_certificate_date':
+      if term == 'last_https_certificate_date':
         formatted_date = format_timestamp(value)
         print(f"{term.upper()}: {formatted_date}")
           
@@ -175,6 +191,62 @@ async def main():
       
     print()  # Add spacing between fields
 
+  # Handle WHOIS data
+  print("WHOIS:")
+  whois_data = None
+  
+  # First try to get WHOIS from main response
+  if whois_from_main:
+    # Check if it's actual WHOIS data or just a timestamp/ID
+    if isinstance(whois_from_main, (str, dict)) and whois_from_main:
+      whois_data = whois_from_main
+  
+  # Try alternative WHOIS fields
+  if not whois_data and whois_alternative:
+    whois_data = whois_alternative
+  
+  # If no WHOIS data found, wait and try again (VirusTotal might need time to process)
+  if not whois_data:
+    print("  Aguardando processamento dos dados de WHOIS...")
+    
+    # Try multiple times with increasing delays
+    for attempt in range(3):
+      await asyncio.sleep(3)  # Wait 3 seconds between attempts
+      
+      try:
+        fresh_result = await getIP(ip, api_key)
+        fresh_data = search_fields(fresh_result, search_terms)
+        
+        # Check for WHOIS in fresh data
+        fresh_whois = fresh_data.get('whois')
+        if fresh_whois and isinstance(fresh_whois, (str, dict)) and fresh_whois:
+          whois_data = fresh_whois
+          break
+        else:
+          # Try alternative fields in fresh data
+          for field in whois_related_fields:
+            if field in fresh_data:
+              whois_data = fresh_data[field]
+              break
+          if whois_data:
+            break
+      except Exception as e:
+        print(f"  Erro na tentativa {attempt + 1}: {e}")
+        continue
+  
+  # Display WHOIS data
+  if whois_data:
+    filtered_whois = filter_whois_data(whois_data)
+    
+    if isinstance(filtered_whois, dict):
+      for key, val in filtered_whois.items():
+        print(f"  • {key}: {val}")
+    else:
+      print(f"  {filtered_whois}")
+  else:
+    print("  Dados de WHOIS não disponíveis")
+  
+  print()
   print("=" * 50)
   print("Consulta finalizada")
   print("=" * 50)
