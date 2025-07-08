@@ -9,7 +9,7 @@ api_key = os.environ.get("VT_API_Key")
 
 # If there is no API key on environment, raise an error
 if not api_key:
-  raise RuntimeError("VT_API_KEY não está configurada!")
+  raise RuntimeError("VT_API_Key não está configurada!")
 
 print("""
         ฅ^•ﻌ•^ฅ
